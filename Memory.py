@@ -16,6 +16,16 @@ class IH(int):
         return IH(val)
 
 
+class GenReg:
+    def __init__(self, value):
+        self.X = IH(value)
+        self.H = IH((0xFF00 & self.X) >> 8)
+        self.L = IH(0x00FF & self.X)
+
+    def allot(self):
+        return self.X, self.H, self.L
+
+
 class Memory:
     def __init__(self, capacity):
         self.memory = bytearray(capacity)
