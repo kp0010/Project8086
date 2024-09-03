@@ -95,8 +95,8 @@ class CPU8086:
             self.D = GenReg(0x3344)
 
             # Index Registers
-            self.SI = IH(0x0000)
-            self.DI = IH(0x0000)
+            self.SI = IH(0x1111)
+            self.DI = IH(0x2222)
             self.BP = IH(0x0000)
             self.SP = IH(0x0000)
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     MEMORY[0x22345] = 0xf1
     MEMORY[0x22346] = 0x1f
 
-    # print(type(cpu.BIU.EU.regRef["A"]))
+    # print(type(cpu.EU.regRef["A"]))
     # print(cpu.EU.A.X)
     # print(cpu.EU.A.H)
     # print(cpu.EU.A.L)
@@ -164,13 +164,13 @@ if __name__ == '__main__':
     MEMORY.displayMemory(0x50, index=1)
     print("HELLO")
 
-    cpu.regRef["AX"] = 0x55
-    cpu.regRef["BX"] = 0x99
+    cpu.regRef["AX"] = 0x5555
+    cpu.regRef["BX"] = 0x9999
+    cpu.EU.B.X = 0x9999
 
-    cpu.Decoder.LOAD("AX", "BX")
-
-    print("HELLO")
-    print(cpu.EU.A.X, cpu.EU.B.X)
+    print(cpu.EU.SI, cpu.EU.DI)
+    cpu.Decoder.LOAD("SI", "DI")
+    print(cpu.EU.SI, cpu.EU.DI)
     # print(cpu.BIU.insQ)
     # cpu.BIU.fillQ()
     # print(cpu.BIU.insQ)
