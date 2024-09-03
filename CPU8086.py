@@ -95,8 +95,8 @@ class CPU8086:
             self.D = GenReg(0x3344)
 
             # Index Registers
-            self.SI = IH(0x1111)
-            self.DI = IH(0x2222)
+            self.SI = IH(0xAAAA)
+            self.DI = IH(0xFFFF)
             self.BP = IH(0x0000)
             self.SP = IH(0x0000)
 
@@ -126,18 +126,6 @@ class CPU8086:
 
         self.Decoder = Decoder(self, MEMORY)
 
-        self.regRef = {
-            'AX': self.EU.A.X, 'AL': self.EU.A.L, 'AH': self.EU.A.H,
-            'BX': self.EU.B.X, 'BL': self.EU.B.L, 'BH': self.EU.B.H,
-            'CX': self.EU.C.X, 'CL': self.EU.C.L, 'CH': self.EU.C.H,
-            'DX': self.EU.D.X, 'DL': self.EU.D.L, 'DH': self.EU.D.H,
-            'SI': self.EU.SI, 'DI': self.EU.DI,
-            'BP': self.EU.BP, 'SP': self.EU.SP,
-            'CS': self.BIU.CS, 'DS': self.BIU.DS,
-            'SS': self.BIU.SS, 'ES': self.BIU.ES,
-            'IP': self.BIU.IP
-        }
-
 
 if __name__ == '__main__':
     cpu = CPU8086()
@@ -160,17 +148,11 @@ if __name__ == '__main__':
     # for i in range(0x0000, 0x100):
     #     print(cpu.BIU.loadMemData(addr=i, word=True))
 
-    print("HELLO")
-    MEMORY.displayMemory(0x50, index=1)
-    print("HELLO")
+    # MEMORY.displayMemory(0x50, index=1)
 
-    cpu.regRef["AX"] = 0x5555
-    cpu.regRef["BX"] = 0x9999
-    cpu.EU.B.X = 0x9999
-
-    print(cpu.EU.SI, cpu.EU.DI)
-    cpu.Decoder.LOAD("SI", "DI")
-    print(cpu.EU.SI, cpu.EU.DI)
+    print(cpu.EU.A.X, cpu.EU.B.X)
+    cpu.Decoder.LOAD("AX", "BX")
+    print(cpu.EU.A.X, cpu.EU.B.X)
     # print(cpu.BIU.insQ)
     # cpu.BIU.fillQ()
     # print(cpu.BIU.insQ)
