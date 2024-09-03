@@ -145,14 +145,16 @@ if __name__ == '__main__':
 
     for i in range(0x0000, 0x100):
         cpu.BIU.writeMemData(data=0x0 + int(i), addr=i)
+
     # for i in range(0x0000, 0x100):
     #     print(cpu.BIU.loadMemData(addr=i, word=True))
 
     # MEMORY.displayMemory(0x50, index=1)
 
     print(cpu.EU.A.X, cpu.EU.B.X)
-    cpu.Decoder.LOAD("AX", "BX")
+    cpu.Decoder.MOV("AX", "0x9999")
     print(cpu.EU.A.X, cpu.EU.B.X)
+
     # print(cpu.BIU.insQ)
     # cpu.BIU.fillQ()
     # print(cpu.BIU.insQ)

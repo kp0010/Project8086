@@ -15,8 +15,10 @@ class Decoder:
             return getattr(self.CPU.BIU, loc)
         elif hasattr(self.CPU.EU, loc[0]):
             return getattr(getattr(self.CPU.EU, loc[0]), loc[-1])
-        # else:
-            # raise AttributeError(f"{loc} Location not found")
+        elif '0x' == loc[:2]:
+            return IH(int(loc, 16))
+        else:
+            raise AttributeError(f"{loc} Location not found")
 
     def setDst(self, loc, val):
         if hasattr(self.CPU.EU, loc):
@@ -25,8 +27,8 @@ class Decoder:
             setattr(self.CPU.BIU, loc, val)
         elif hasattr(self.CPU.EU, loc[0]):
             setattr(getattr(self.CPU.EU, loc[0]), loc[-1], val)
-        # else:
-            # raise AttributeError(f"{loc} Location not found")
+        else:
+            raise AttributeError(f"{loc} Location not found")
 
-    def LOAD(self, src, dst):
+    def MOV(self, dst, src):
         self.setDst(dst, self.getSrc(src))
