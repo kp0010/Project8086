@@ -1,6 +1,7 @@
-from Memory import Memory, IH, GenReg
+from Memory import Memory, IH, GenReg, Reg
 from InstructionSet import *
 from Decoder import Decoder
+from ALU import ALU
 
 EXTBUS_SIZE = 20  # bits
 INTBUS_SIZE = 16  # bits
@@ -89,16 +90,16 @@ class CPU8086:
     class EU:
         def __init__(self, InsQBus):
             # General Registers
-            self.A = GenReg(0xAABB)
-            self.B = GenReg(0xCCDD)
-            self.C = GenReg(0x1122)
-            self.D = GenReg(0x3344)
+            self.A = GenReg(0x1111)
+            self.B = GenReg(0x2222)
+            self.C = GenReg(0x3333)
+            self.D = GenReg(0x4444)
 
             # Index Registers
-            self.SI = IH(0xAAAA)
-            self.DI = IH(0xFFFF)
-            self.BP = IH(0x0000)
-            self.SP = IH(0x0000)
+            self.SI = Reg(0xAAAA)
+            self.DI = Reg(0xBBBB)
+            self.BP = Reg(0xCCCC)
+            self.SP = Reg(0xDDDD)
 
             # Flags
             self.CF = IH(0b0)
@@ -123,8 +124,20 @@ class CPU8086:
 
         self.BIU = self.BIU(self.ExtAddrBus, self.InsQBus)
         self.EU = self.EU(self.InsQBus)
+        self.ALU = ALU()
 
-        self.Decoder = Decoder(self, MEMORY)
+        self.Decoder = Decoder(self, MEMORY, self.ALU)
+
+    def displayReg(self):
+        disp = f"""
+EU Register
+AX = {self.EU.A.X}  |  BX = {self.EU.B.X}
+CX = {self.EU.C.X}  |  DX = {self.EU.D.X}
+SI = {self.EU.SI}  |  DI = {self.EU.DI}
+BP = {self.EU.BP}  |  SP = {self.EU.SP}
+    """
+
+        print(disp)
 
 
 if __name__ == '__main__':
@@ -133,41 +146,30 @@ if __name__ == '__main__':
     MEMORY[0x22345] = 0xf1
     MEMORY[0x22346] = 0x1f
 
-    # print(type(cpu.EU.regRef["A"]))
-    # print(cpu.EU.A.X)
-    # print(cpu.EU.A.H)
-    # print(cpu.EU.A.L)
-    # cpu.EU.regRef['A'].X = 0x1122
-    # # cpu.EU.A.X = 0x1111f
-    # print(cpu.EU.A.X)
-    # print(cpu.EU.A.H)
-    # print(cpu.EU.A.L)
-
     for i in range(0x0000, 0x100):
         cpu.BIU.writeMemData(data=0x0 + int(i), addr=i)
 
-    # for i in range(0x0000, 0x100):
-    #     print(cpu.BIU.loadMemData(addr=i, word=True))
+    MEMORY.displayMemory()
 
-    # MEMORY.displayMemory(0x50, index=1)
-
-    print(cpu.EU.A.X, cpu.EU.B.X)
-    cpu.Decoder.MOV("AX", "0x9999")
-    print(cpu.EU.A.X, cpu.EU.B.X)
-
-    # print(cpu.BIU.insQ)
-    # cpu.BIU.fillQ()
-    # print(cpu.BIU.insQ)
-    # cpu.BIU.shiftQ(by=3)
-    # cpu.BIU.IP += 3
-    # print(cpu.BIU.insQ)
-    # cpu.BIU.fillQ()
-    # print(cpu.BIU.insQ)
-    # cpu.BIU.clearQ()
-    # print(cpu.BIU.insQ)
-    # cpu.BIU.IP += 244
-    # cpu.BIU.fillQ()
-    # print(cpu.BIU.insQ)
-
-    # print(cpu.BIU.loadMemData(cpu.BIU.DS, 0x2345))
-    # print(MEMORY[cpu.BIU.gen_phy_addr(cpu.BIU.DS, 0x2346)])
+    cpu.displayReg()
+    while True:
+        ins = input("ENTER THE INSTRUCTION: ")
+        ins = ins.split(" ")
+        ins[0] = ins[0].upper()
+        if ins[0] == "MOV":
+            cpu.Decoder.MOV(ins[1], ins[2])
+            cpu.displayReg()
+        elif ins[0] == "ADD":
+            cpu.Decoder.ADD(ins[1], ins[2])
+            cpu.displayReg()
+        elif ins[0] == "SUB":
+            cpu.Decoder.SUB(ins[1], ins[2])
+            cpu.displayReg()
+        elif ins[0] == "REG":
+            cpu.displayReg()
+        elif ins[0] == "MEM":
+            MEMORY.displayMemory()
+            print("\n")
+        elif ins[0] == "HLT":
+            print("EXITED")
+            break

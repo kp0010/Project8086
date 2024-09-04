@@ -1,7 +1,11 @@
 class IH(int):
     def __repr__(self):
-        lg = len(hex(self))
-        return "0x" + hex(self)[2:].zfill(lg % 2 + lg - 2)
+        lg = len(hex(self)) - 2
+        return "0x" + "0" * (2-lg) + hex(self)[2:]
+
+    def __str__(self):
+        lg = len(hex(self)) - 2
+        return "0x" + "0" * (2-lg) + hex(self)[2:]
 
     def __add__(self, other):
         val = int(self) + int(other)
@@ -16,27 +20,37 @@ class IH(int):
         return IH(val)
 
 
+class Reg(IH):
+    def __repr__(self):
+        lg = len(hex(self)) - 2
+        return "0x" + "0" * (4-lg) + hex(self)[2:]
+
+    def __str__(self):
+        lg = len(hex(self)) - 2
+        return "0x" + "0" * (4-lg) + hex(self)[2:]
+
+
 class GenReg:
     def __init__(self, value):
-        self._X = IH(value)
+        self._X = Reg(value)
 
-    @property
-    def H(self): return IH((0xFF00 & self._X) >> 8)
+    @ property
+    def H(self): return Reg((0xFF00 & self._X) >> 8)
 
-    @H.setter
-    def H(self, value): self._X = IH((value * (16 ** 2)) + (self._X & 0xFF))
+    @ H.setter
+    def H(self, value): self._X = Reg((value * (16 ** 2)) + (self._X & 0xFF))
 
-    @property
-    def L(self): return IH((0x00FF & self._X))
+    @ property
+    def L(self): return Reg((0x00FF & self._X))
 
-    @L.setter
-    def L(self, value): self._X = IH((value + (self._X & 0xFF00) * (16 ** 2)))
+    @ L.setter
+    def L(self, value): self._X = Reg(value + (self._X & 0xFF00))
 
-    @property
+    @ property
     def X(self): return self._X
 
-    @X.setter
-    def X(self, value): self._X = IH(value)
+    @ X.setter
+    def X(self, value): self._X = Reg(value)
 
     def allot(self):
         return self.X, self.H, self.L
@@ -49,6 +63,7 @@ class Memory:
 
     def __getitem__(self, address):
         """Get the address and returns the value at that address"""
+        address = int(address, 16)
         if 0 <= address < self.capacity:
             return IH(self.memory[address])
         else:
@@ -56,6 +71,8 @@ class Memory:
 
     def __setitem__(self, address, byte):
         """Sets the value at the given address"""
+        if type(address) is not int:
+            address = int(address, 16)
         if 0 <= address < self.capacity:
             self.memory[address] = byte
         else:
@@ -65,7 +82,8 @@ class Memory:
         """Displays the memory contents fully or some section"""
         if index:
             print("xxxxx:  ", end="")
-            [print(f"{str(IH(x))[2:]}{' -' if x == 0x07 else ''}", end=" ") for x in range(0x10)]
+            [print(f"{str(IH(x))[2:]}{' -' if x == 0x07 else ''}", end=" ")
+             for x in range(0x10)]
             print("\n", end='')
         start = 0x00 if start is None else start // 16 * 16
         end = start + 0x5f if end is None else end
@@ -82,16 +100,12 @@ class Memory:
 
 if __name__ == '__main__':
     memory = Memory(2 ** 20)
-    # memory[0x10000] = 0b10100000
-    # print(memory[0x10000])
-    memory.displayMemory()
-    #
-    # R = GenReg(0x1122)
-    # x, y, z = R.allot()
-    # print(R.X)
-    # print(R.H)
-    #
-    # R.H = 0xFF
-    # R.X = 0x5566
-    # print(R.H)
-    # print(R.X)
+    # memory.displayMemory()
+
+    R = GenReg(0x1122)
+    print(R.X)
+    print(R.H)
+
+    R.L = 0x44
+    print(R.H)
+    print(R.X)
