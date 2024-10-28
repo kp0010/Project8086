@@ -11,7 +11,7 @@ class Token:
 
 class Lexer:
     def __init__(self):
-        self.file_name = "/home/kp/PycharmProjects/Project8086/test.asm"
+        self.file_name = "./test.asm"
 
         self.start = 0
         self.curr = 0
@@ -46,10 +46,6 @@ class Lexer:
 
         self.scanTokens()
 
-        # for i in self.tokens:
-        # print(i)
-        # print(self.errors)
-
     def read_file(self):
         with open(self.file_name, "r") as asm:
             contents = " ".join(asm.readlines())
@@ -70,10 +66,10 @@ class Lexer:
             case ')':
                 self.addToken("RIGHT_PAREN")
             case '[':
-                self.addMem()
-                # self.addToken("LEFT_BRACE")
-            # case ']':
-                # self.addToken("RIGHT_BRACE")
+                # self.addMem()
+                self.addToken("LEFT_BRACE")
+            case ']':
+                self.addToken("RIGHT_BRACE")
             case '{':
                 self.addToken("LEFT_CBRACE")
             case '}':
@@ -140,9 +136,9 @@ class Lexer:
             self.addToken("OPCODE")
             return
         if txt.upper() in self.registers:
-            self.addToken("REGISTER")
+            self.addToken("REGISTER", txt.upper())
             return
-        self.addToken("IDENTIFIER")
+        self.addToken("IDENTIFIER", txt)
 
     def addString(self):
         while self.peek() != '"' and not self.isAtEnd():
@@ -157,7 +153,6 @@ class Lexer:
         self.advance()
 
         val = self.source[self.start + 1: self.curr - 1]
-        print(val)
         self.addToken("STRING", val)
 
     def ishex(self, char):
@@ -185,7 +180,7 @@ class Lexer:
         else:
             num = int(num)
 
-        self.addToken("IMMEDIATE", num)
+        self.addToken("NUMBER", num)
 
     def addMem(self):
         hexn = False
@@ -230,4 +225,5 @@ class Lexer:
 
 if __name__ == "__main__":
     lx = Lexer()
+    print("LEXED: ")
     [print(x) for x in lx.tokens]
