@@ -1,7 +1,6 @@
-from Memory import Memory, IH, GenReg, Reg
-from InstructionSet import *
-from Decoder import Decoder
-from ALU import ALU
+from CPU.Memory import Memory, IH, GenReg, Reg
+from CPU.Decoder import Decoder
+from CPU.ALU import ALU
 
 EXTBUS_SIZE = 20  # bits
 INTBUS_SIZE = 16  # bits
@@ -115,6 +114,7 @@ class CPU8086:
 
         def fetchDecodeIns(self):
             curIns = self.InsQBus
+            return curIns
 
     def __init__(self):
 
@@ -125,6 +125,7 @@ class CPU8086:
         self.BIU = self.BIU(self.ExtAddrBus, self.InsQBus)
         self.EU = self.EU(self.InsQBus)
         self.ALU = ALU()
+        self.MEMORY = MEMORY
 
         self.Decoder = Decoder(self, MEMORY, self.ALU)
 
@@ -152,24 +153,38 @@ if __name__ == '__main__':
     MEMORY.displayMemory()
 
     cpu.displayReg()
-    while True:
-        ins = input("ENTER THE INSTRUCTION: ")
-        ins = ins.split(" ")
-        ins[0] = ins[0].upper()
-        if ins[0] == "MOV":
-            cpu.Decoder.MOV(ins[1], ins[2])
-            cpu.displayReg()
-        elif ins[0] == "ADD":
-            cpu.Decoder.ADD(ins[1], ins[2])
-            cpu.displayReg()
-        elif ins[0] == "SUB":
-            cpu.Decoder.SUB(ins[1], ins[2])
-            cpu.displayReg()
-        elif ins[0] == "REG":
-            cpu.displayReg()
-        elif ins[0] == "MEM":
-            MEMORY.displayMemory()
-            print("\n")
-        elif ins[0] == "HLT":
-            print("EXITED")
-            break
+    # while True:
+    #     ins = input("ENTER THE INSTRUCTION: ")
+    #     ins = ins.split(" ")
+    #     ins[0] = ins[0].upper()
+    #     if ins[0] == "MOV":
+    #         cpu.Decoder.MOV(ins[1], ins[2])
+    #         cpu.displayReg()
+    #     elif ins[0] == "ADD":
+    #         cpu.Decoder.ADD(ins[1], ins[2])
+    #         cpu.displayReg()
+    #     elif ins[0] == "SUB":
+    #         cpu.Decoder.SUB(ins[1], ins[2])
+    #         cpu.displayReg()
+    #     elif ins[0] == "REG":
+    #         cpu.displayReg()
+    #     elif ins[0] == "MEM":
+    #         MEMORY.displayMemory()
+    #         print("\n")
+    #     elif ins[0] == "HLT":
+    #         print("EXITED")
+    #         break
+
+    # import sys
+    # from pathlib import Path
+    # path_r = Path(__file__).parents[2]
+    # sys.path.append(str(path_r))
+    # print(sys.path)
+
+    import Compiler.Lexer
+    import Compiler.Parser
+
+    lexer = Compiler.Lexer("./test.asm")
+
+    parser = Compiler.Parser(lexer.tokens)
+    print(parser.instructions())

@@ -1,13 +1,11 @@
-import Lexer
-
-
 class Instruction:
-    def __init__(self, opcode, *oprands):
+    def __init__(self, opcode, *operands):
         self.opcode = opcode
-        self.oprands = oprands
+        self.operands = list(operands)
 
     def __repr__(self):
-        return f"INS: {self.opcode.upper()} {self.oprands}"
+        return f"INS: {self.opcode.upper()} " +\
+            ", ".join((str(x) for x in self.operands))
 
 
 class Binary:
@@ -18,6 +16,20 @@ class Binary:
 
     def __repr__(self):
         return f"{self.left} {self.operator.lexeme} {self.right}"
+
+    def __str__(self):
+        return f"{self.left} {self.operator.lexeme} {self.right}"
+
+    def resolve(self):
+        match self.operator.lexeme:
+            case "+":
+                return self.left + self.right
+            case "-":
+                return self.left - self.right
+            case "*":
+                return self.left * self.right
+            case "/":
+                return self.left / self.right
 
 
 class Parser:
@@ -48,7 +60,7 @@ class Parser:
                     term = self.term()
                     operands += [term]
 
-        return Instruction(opcode, operands)
+        return Instruction(opcode, *operands)
 
     def term(self):
         expr = self.factor()
@@ -122,9 +134,10 @@ class Parser:
 
 
 if __name__ == "__main__":
+    import Lexer
     lex = Lexer.Lexer()
     p = Parser(lex.tokens)
     # print("LEXED: ")
     # [print(x) for x in lex.tokens]
-    print("\nPARSED: ")
+    print("PARSED: ")
     [print(x) for x in p.instructions]

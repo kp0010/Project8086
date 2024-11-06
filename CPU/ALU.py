@@ -1,4 +1,4 @@
-from Memory import IH, Reg
+from CPU.Memory import IH, Reg
 
 
 class ALU:
@@ -22,6 +22,7 @@ class ALU:
         for i in range(lg - 1, -1, -1):
             rs = self.fullSubtracter(a[i], b[i], bn)
             sm = str(rs[0]) + sm
+            # sm = sm[-4:]
             bn = rs[1]
         sm = Reg(int(sm, 2))
         return sm, bn

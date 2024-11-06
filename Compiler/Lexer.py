@@ -10,8 +10,8 @@ class Token:
 
 
 class Lexer:
-    def __init__(self):
-        self.file_name = "./test.asm"
+    def __init__(self, file="./test.asm"):
+        self.file_name = file
 
         self.start = 0
         self.curr = 0

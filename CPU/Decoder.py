@@ -1,5 +1,5 @@
-from InstructionSet import InstructionSet
-from Memory import Memory, IH, GenReg, Reg
+from CPU.InstructionSet import InstructionSet
+from CPU.Memory import Memory, IH
 
 
 class Decoder:
@@ -47,7 +47,12 @@ class Decoder:
             raise AttributeError(f"{loc} Location not found")
 
     def MOV(self, op1, op2):
-        op1, op2 = op1.upper(), op2.upper()
+        try:
+            op1 = op1.upper()
+            op2 = op2.upper()
+        except AttributeError:
+            ...
+
         bytd = 2
         byts = 2
         if op1[-1] in "HL":
@@ -64,7 +69,12 @@ class Decoder:
         self.setDst(op1, val, byt=bytd)
 
     def ADD(self, op1, op2):
-        op1, op2 = op1.upper(), op2.upper()
+        try:
+            op1 = op1.upper()
+            op2 = op2.upper()
+        except AttributeError:
+            ...
+
         op1val = self.getSrc(op1)
         op2val = self.getSrc(op2)
         sum_res = self.ALU.add(op1=op1val, op2=op2val)
@@ -72,7 +82,12 @@ class Decoder:
         self.setDst(op1, sum_res[0])
 
     def SUB(self, op1, op2):
-        op1, op2 = op1.upper(), op2.upper()
+        try:
+            op1 = op1.upper()
+            op2 = op2.upper()
+        except AttributeError:
+            ...
+
         op1val = self.getSrc(op1)
         op2val = self.getSrc(op2)
         sub_res = self.ALU.sub(op1=op1val, op2=op2val)
